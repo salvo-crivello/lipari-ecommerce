@@ -1,165 +1,201 @@
+"use clients";
+import axios from "axios";
 import React, {
-	PropsWithChildren,
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useState,
-	createContext,
-	useContext,
-} from 'react';
-import { loginType, signupType } from '../types/authType';
-import axios from 'axios';
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { loginType, signupType } from "../types/authType";
+
+export type User = {
+  id: number | string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  image: string;
+  gender: string;
+};
 
 type authContextType = {
-	signup: ({ signupData }: { signupData: signupType }) => Promise<void>;
-	login: ({ loginData }: { loginData: loginType }) => Promise<void>;
-	logout: () => Promise<void>;
-	user: {
-		id: string;
-		name: string;
-		email: string;
-	};
-	token: string | null;
+  signup: (signupData: signupType) => Promise<void>;
+  login: (loginData: loginType) => Promise<void>;
+  logout: () => Promise<void>;
+  fetchAccessToken: () => Promise<void>;
+  user: User | null;
+  token: string | null;
 };
 
 const authContext = createContext<authContextType>({
-	signup: async () => {},
-	login: async () => {},
-	logout: async () => {},
-	user: {
-		id: '',
-		name: '',
-		email: '',
-	},
-	token: null,
+  signup: async () => {},
+  login: async () => {},
+  logout: async () => {},
+  fetchAccessToken: async () => {},
+  user: null,
+  token: null,
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-	const [token, setToken] = useState(null);
-	const [user, setUser] = useState({ id: '', name: '', email: '' });
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const isRetryRef = useRef(false);
 
-	// SIGNUP FUNCTION
+  // SIGNUP FUNCTION
 
-	const signup = useCallback(async ({ signupData }: { signupData: signupType }) => {
-		try {
-			const response = await axios.post('/api/signup', signupData, { withCredentials: true });
-			const data = await response.data;
-			setToken(data.token);
-			setUser(data.user);
-		} catch (error) {
-			console.error('Signup failed:', error);
-		}
-	}, []);
+  const signup = useCallback(async (signupData: signupType) => {
+    try {
+      const response = await axios.post("/api/auth/signup", signupData, {
+        withCredentials: true,
+      });
+      const data = await response.data;
+      setToken(data.accessToken);
+      setUser(data.user);
+    } catch (error) {
+      console.error("Signup failed:", error);
+    }
+  }, []);
 
-	// LOGIN FUNCTION
+  // LOGIN FUNCTION
 
-	const login = useCallback(async ({ loginData }: { loginData: loginType }) => {
-		try {
-			const response = await axios.post('/api/login', loginData, { withCredentials: true });
-			const data = await response.data;
-			setToken(data.token);
-			setUser(data.user);
-		} catch (error) {
-			console.error('Login failed:', error);
-			setToken(null);
-			setUser({ id: '', name: '', email: '' });
-		}
-	}, []);
+  const login = useCallback(async (loginData: loginType) => {
+    try {
+      const response = await axios.post("api/auth/login", loginData, {
+        withCredentials: true,
+      });
+      const data = await response.data;
+      const { accessToken, refreshToken, ...userData } = data;
+      setUser(userData);
+      setToken(accessToken);
+      console.log("Login successful:", data);
+    } catch (error) {
+      console.error("Login failed:", error);
+      setToken(null);
+      setUser(null);
+    }
+  }, []);
 
-	// LOGOUT FUNCTION
+  // LOGOUT FUNCTION
 
-	const logout = useCallback(async () => {
-		try {
-			const response = await axios.post('/api/logout', { withCredentials: true });
+  const logout = useCallback(async () => {
+    // try {
+    //   const response = await axios.post("/api/auth/logout", {
+    //     withCredentials: true,
+    //   });
 
-			setToken(null);
-			setUser({ id: '', name: '', email: '' });
-			console.log('Logout successful:', response.data);
-		} catch (error) {
-			console.error('Logout failed:', error);
-		}
-	}, []);
+    //   setToken(null);
+    //   setUser(null);
+    //   console.log("Logout successful:", response.data);
+    // } catch (error) {
+    //   console.error("Logout failed:", error);
+    // }
 
-	// FETCH ACCESS TOKEN AND USER DATA - ON FIRST MOUNT
+    setToken(null);
+    setUser(null);
+  }, []);
 
-	useEffect(() => {
-		const fetchAccessToken = async () => {
-			try {
-				const response = await axios.get('/api/get-token', { withCredentials: true });
-				const data = await response.data;
-				setToken(data.token);
-				setUser(data.user);
-			} catch (error) {
-				console.error('Failed to fetch user data:', error);
-				setToken(null);
-			}
-		};
+  // FETCH USER DATA FUNCTION
 
-		fetchAccessToken();
-	}, []);
+  const fetchAccessToken = useCallback(async () => {
+    try {
+      const response = await axios.get("api/auth/me", {
+        withCredentials: true,
+      });
+      const data = await response.data;
+      console.log("useEffect - Fetched user data:", data);
+      const { accessToken, refreshToken, ...userData } = data;
+      setUser(userData);
+      setToken(accessToken);
+    } catch (error) {
+      console.log("useEffect - Failed login: ", error);
+      setToken(null);
+    }
+  }, []);
 
-	// AXIOS INTERCEPTORS FOR ADD TOKEN TO REQUEST HEADERS
+  // FETCH ACCESS TOKEN AND USER DATA - ON FIRST MOUNT
 
-	useLayoutEffect(() => {
-		const requestInterceptor = axios.interceptors.request.use((config) => {
-			if (token) {
-				config.headers.Authorization = token ? `Bearer ${token}` : config.headers.Authorization;
-			}
-			return config;
-		});
+  useEffect(() => {
+    console.log("useEffect start");
+    fetchAccessToken();
+  }, []);
 
-		return () => {
-			axios.interceptors.request.eject(requestInterceptor);
-		};
-	}, [token]);
+  // AXIOS INTERCEPTORS FOR ADD TOKEN TO REQUEST HEADERS
 
-	// AXIOS INTERCEPTORS FOR REFRESH TOKEN ON 401 ERROR
+  useLayoutEffect(() => {
+    console.log("request interceptor");
+    const requestInterceptor = axios.interceptors.request.use((config) => {
+      if (token && !isRetryRef.current) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log("Token added:", config.headers.Authorization);
+      } else {
+        console.log("No token added:", config.headers.Authorization);
+      }
 
-	useLayoutEffect(() => {
-		const responseInterceptor = axios.interceptors.response.use(
-			(response) => response,
-			async (error) => {
-				const originalRequest = error.config;
+      return config;
+    });
 
-				if (error.response.status === 401) {
-					try {
-						const response = await axios.get('/api/refresh-token', { withCredentials: true });
-						const data = await response.data;
-						originalRequest.headers.Authorization = `Bearer ${data.token}`;
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+    };
+  }, [token]);
 
-						return axios(originalRequest);
-					} catch (error) {
-						console.error('Failed to get refresh-token:', error);
-						setToken(null);
-					}
-				}
+  // AXIOS INTERCEPTORS FOR REFRESH TOKEN ON 401 ERROR
 
-				return Promise.reject(error);
-			}
-		);
+  useLayoutEffect(() => {
+    console.log("response interceptor");
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
 
-		return () => {
-			axios.interceptors.response.eject(responseInterceptor);
-		};
-	}, []);
+        if (error.response.status === 401 && !isRetryRef.current) {
+          isRetryRef.current = true;
+          try {
+            const response = await axios.get("api/auth/refresh", {
+              withCredentials: true,
+            });
+            const data = await response.data;
+            originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+            return axios(originalRequest);
+          } catch (error) {
+            console.log("refresh-token failed: ", error);
+            setToken(null);
+          }
+        }
 
-	//USEMEMO - OPTIMIZE CONTEXT VALUE
+        return Promise.reject(error);
+      }
+    );
 
-	const contextValue = React.useMemo(() => {
-		return {
-			signup,
-			login,
-			logout,
-			user,
-			token,
-		};
-	}, [signup, login, logout, user, token]);
+    return () => {
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
 
-	///////////////////////////////////////////////////
+  //USEMEMO - OPTIMIZE CONTEXT VALUE
 
-	return <authContext.Provider value={contextValue}>{children}</authContext.Provider>;
+  const contextValue = React.useMemo(() => {
+    return {
+      signup,
+      login,
+      logout,
+      user,
+      token,
+      fetchAccessToken,
+    };
+  }, [signup, login, logout, user, token, fetchAccessToken]);
+
+  ///////////////////////////////////////////////////
+
+  return (
+    <authContext.Provider value={contextValue}>{children}</authContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-	return useContext(authContext);
+  return useContext(authContext);
 };

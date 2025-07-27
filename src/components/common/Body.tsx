@@ -1,18 +1,23 @@
-import React, { PropsWithChildren } from 'react';
-import Header from './Header';
-import Footer from './Footer';
-import { AuthProvider } from '@/src/contexts/AuthProvider';
+"use client";
+import { AuthProvider } from "@/src/contexts/AuthProvider";
+import store from "@/src/store/store";
+import { PropsWithChildren } from "react";
+import { Provider } from "react-redux";
+import Footer from "./Footer";
+import Header from "./Header";
 
 function Body({ children }: PropsWithChildren) {
-	return (
-		<body>
-			<Header />
-			<AuthProvider>
-				<main>{children}</main>
-			</AuthProvider>
-			<Footer />
-		</body>
-	);
+  return (
+    <body>
+      <Provider store={store}>
+        <AuthProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </AuthProvider>
+      </Provider>
+    </body>
+  );
 }
 
 export default Body;

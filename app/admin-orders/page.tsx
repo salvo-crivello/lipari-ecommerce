@@ -1,5 +1,5 @@
-import AdminOrders from '@/src/pages/AdminOrders';
+import AdminOrders from "@/src/templates/AdminOrders";
 
 export default function AdminOrdersPage() {
-	return <AdminOrders />;
+  return <AdminOrders />;
 }

@@ -1,10 +1,14 @@
 interface userType {
-	id: string;
-	name: string;
-	email: string;
-	password: string;
+  id: string;
+  username: string;
+  email: string;
+  password: string;
 }
 
-export type signupType = Omit<userType, 'id'>;
+export type signupType = Omit<userType, "id">;
 
-export type loginType = Omit<userType, 'id' | 'name'>;
+export type loginType = {
+  username: string;
+  password: string;
+  expiresInMins?: number;
+};
