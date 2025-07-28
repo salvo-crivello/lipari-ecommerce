@@ -40,6 +40,8 @@ const authContext = createContext<authContextType>({
   token: null,
 });
 
+////////////////////
+
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -63,6 +65,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   // LOGIN FUNCTION
 
   const login = useCallback(async (loginData: loginType) => {
+    if (loginData.username || loginData.password) return;
     try {
       const response = await axios.post("api/auth/login", loginData, {
         withCredentials: true,
