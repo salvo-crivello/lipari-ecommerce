@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/src/components/Button";
+import { Button } from "@/src/components/ui/Button";
 import {
   Card,
   CardContent,
@@ -10,11 +10,10 @@ import {
   CardTitle,
 } from "@/src/components/ui/card";
 import { LoginForm } from "@/src/forms/LoginForm";
-import { AuthMode } from "@/src/types/authmode";
 
 function CardLoginForm() {
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm bg-white shadow-lg shadow-neutral-200">
       <CardHeader>
         <CardTitle>Accedi al tuo account</CardTitle>
         <CardDescription className="text-sm text-pretty leading-snug">
@@ -25,14 +24,6 @@ function CardLoginForm() {
         <LoginForm />
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button
-          variant="fill"
-          form="login-form"
-          type="submit"
-          className="w-full"
-        >
-          Accedi
-        </Button>
         <span className="text-xs text-center mt-2 text-neutral-500">
           Non hai ancora un account?
           <Button

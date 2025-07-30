@@ -8,6 +8,7 @@ import { InputGroup } from "../components/ui/InputGroup";
 import { useAuth } from "../contexts/AuthProvider";
 import { loginSchema } from "./schemas/formsSchema";
 import { useRouter } from "next/navigation";
+import { Button } from "../components/ui/Button";
 
 export const FORM_ID = "login-form";
 
@@ -64,6 +65,14 @@ export const LoginForm = () => {
         ></InputGroup.InputPassword>
         <InputGroup.Message>{errors.password?.message}</InputGroup.Message>
       </InputGroup>
+      <Button
+        variant="fill"
+        form="login-form"
+        type="submit"
+        className="w-full mt-5"
+      >
+        Accedi
+      </Button>
     </form>
   );
 };

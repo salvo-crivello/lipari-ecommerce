@@ -1,61 +1,78 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import Image from "next/image";
+import ProductCard from "@/src/components/ProductCard";
 import { useFetchProductsQuery } from "@/src/store/productsApiSlice";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { nextPage, setProducts } from "../../store/sliceProducts";
-import { Button } from "@/src/components/Button";
-import { p } from "motion/react-client";
-import { useEffect } from "react";
+import { RootState } from "../../store/store";
+import LoadingSpinner from "@/src/components/LoadingSpinner";
 
 function ProductsSectionStore() {
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   const { products, pagination } = useSelector(
     (state: RootState) => state.productsData
   );
   const dispatch = useDispatch();
 
-  const { data, isLoading, error } = useFetchProductsQuery(pagination);
+  const { data, isLoading } = useFetchProductsQuery(pagination);
 
   useEffect(() => {
-    if (!products[pagination]) {
+    if (!isLoading && !products[pagination]) {
+      console.log(`Saving data for page ${pagination}:`, data);
       dispatch(setProducts(data));
     }
-  }, [data, pagination, products, dispatch]);
+  }, [data, pagination, products, isLoading, dispatch]);
 
-  const handleLoadMore = () => {
-    dispatch(nextPage());
-  };
+  useEffect(() => {
+    const currentRef = loadMoreRef.current;
+    if (!currentRef) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+
+        if (entry.isIntersecting && !isLoading) {
+          dispatch(nextPage());
+        }
+      },
+      {
+        root: null,
+        rootMargin: "40px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [dispatch, isLoading]);
+
+  if (isLoading && !data) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <section>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-5 bg-white">
+    <section className="px-5 lg:px-10 py-20 bg-neutral-50">
+      <ul className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ">
         {products &&
           Object.values(products)
             .flat()
-            .map((product, i) => (
-              <li
-                key={`${i}-${product.id}`}
-                className="p-4 border border-gray-200 rounded-lg shadow-sm"
-              >
-                <Image
-                  src={product.image || "/placeholder.png"}
-                  alt={product.title || "product image"}
-                  width={100}
-                  height={100}
-                  className="object-cover w-24 h-24"
-                  placeholder="blur"
-                  blurDataURL="/placeholder.png"
-                />
-                <h4 className="text-xl font-bold">{product.title}</h4>
-                <p className="text-gray-700">{product.description}</p>
-                <span className="text-green-600">${product.price}</span>
-              </li>
-            ))}
+            .map((product, i) => {
+              if (!product) return null;
+
+              return (
+                <li key={`${i}-${product.id}`} className="flex">
+                  <ProductCard product={product} />
+                </li>
+              );
+            })}
       </ul>
-      <Button onClick={handleLoadMore}>
-        {isLoading ? "loading ..." : "vedi altri"}
-      </Button>
+      <div ref={loadMoreRef}></div>
     </section>
   );
 }

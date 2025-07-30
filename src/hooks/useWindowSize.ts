@@ -10,6 +10,7 @@ export const useWindowSize = () => {
   const isMD = useMemo(() => width >= 768, [width]);
   const isLG = useMemo(() => width >= 1024, [width]);
   const isXL = useMemo(() => width >= 1280, [width]);
+  const isXXL = useMemo(() => width >= 1536, [width]);
 
   const isPortrait = useMemo(
     () => height > width && width > 640,
@@ -43,6 +44,7 @@ export const useWindowSize = () => {
     isMD,
     isLG,
     isXL,
+    isXXL,
     isPortrait,
   };
 };

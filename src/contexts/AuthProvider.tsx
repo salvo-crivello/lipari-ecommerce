@@ -20,6 +20,7 @@ export type User = {
   email: string;
   image: string;
   gender: string;
+  role: string;
 };
 
 type authContextType = {
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   // LOGIN FUNCTION
 
   const login = useCallback(async (loginData: loginType) => {
-    if (loginData.username || loginData.password) return;
+    if (!loginData.username || !loginData.password) return;
     try {
       const response = await axios.post("api/auth/login", loginData, {
         withCredentials: true,

@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-export type productType = {
+export interface productType {
   id: number;
   title: string;
   image: string;
@@ -11,7 +11,8 @@ export type productType = {
   color: string;
   category: string;
   discount: number;
-};
+  popular?: boolean;
+}
 
 interface ProductsState {
   products: { [page: number]: productType[] };
@@ -54,6 +55,9 @@ const productsSlice = createSlice({
         state.products[state.pagination] = action.payload;
       }
     },
+    setPage: (state, action) => {
+      state.pagination = action.payload;
+    },
   },
   // extraReducers: (builder) => {
   //   builder
@@ -74,5 +78,5 @@ const productsSlice = createSlice({
   // },
 });
 
-export const { nextPage, setProducts } = productsSlice.actions;
+export const { nextPage, setProducts, setPage } = productsSlice.actions;
 export default productsSlice.reducer;

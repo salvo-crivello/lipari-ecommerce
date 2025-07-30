@@ -17,7 +17,7 @@ import clsx from "clsx";
 import { Eye, EyeClosed } from "lucide-react";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 import Link from "next/link";
-import Icon from "../Icon";
+import Icon from "./Icon";
 
 const labelVariants = cva("", {
   variants: {
@@ -245,6 +245,10 @@ const InputText = forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
+
+////////////////////
+//INPUT DROPDOWN//
+////////////////////
 
 ////////////////////
 //INPUT PASSWORD//

@@ -1,11 +1,24 @@
 "use client";
+import { toggleCart } from "@/src/store/sliceCart";
+import { RootState } from "@/src/store/store";
 import { navLinks } from "@/src/utils/data";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 
 const DesktopMenu = () => {
   const pathname = usePathname();
+  const { isOpen: cartIsOpen } = useSelector(
+    (state: RootState) => state.cartData
+  );
+  const dispatch = useDispatch();
+
+  const handleClick = () => {
+    if (cartIsOpen) {
+      dispatch(toggleCart());
+    }
+  };
 
   return (
     <ul className="flex gap-5 w-full justify-end mr-5">
@@ -15,8 +28,9 @@ const DesktopMenu = () => {
             href={page.path}
             aria-label={`Navigate to ${page.name}`}
             aria-disabled={pathname === page.path}
+            onClick={handleClick}
             className={clsx(
-              " font-mono uppercase transition-all duration-150 leading-0",
+              "transition-all duration-150 leading-0 font-medium",
               {
                 " text-white group-hover:text-blue-900": pathname !== page.path,
                 " text-blue-900 pointer-events-none": pathname === page.path,

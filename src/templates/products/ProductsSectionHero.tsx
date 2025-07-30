@@ -2,8 +2,11 @@ import React from "react";
 
 function ProductsSectionHero() {
   return (
-    <header className="h-[500px] bg-blue-300 px-5 lg:px-10 pt-40">
-      ProductsSectionHero
+    <header className="px-5 lg:px-10 py-40 max-w-7xl mx-auto">
+      <h2 className="text-4xl font-bold leading-tight">
+        Prodotti <span className="text-blue-500 uppercase">tech</span> della
+        Community
+      </h2>
     </header>
   );
 }

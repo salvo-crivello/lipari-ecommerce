@@ -19,6 +19,13 @@ export const loginSchema = z.object({
   // }),
 });
 
+export const promoSchema = z.object({
+  promocode: z
+    .string()
+    .min(3, { message: "At least 3 chars." })
+    .max(20, { message: "Max 20 chars." }),
+});
+
 //////////////////
 // SIGNUP SCHEMA
 //////////////////

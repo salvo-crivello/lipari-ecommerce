@@ -3,9 +3,24 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      new URL("https://storage.googleapis.com/fir-auth-1c3bc.appspot.com/**"),
-      new URL("https://dummyjson.com/**"),
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        pathname: "/fir-auth-1c3bc.appspot.com/**",
+      },
+      {
+        protocol: "https",
+        hostname: "dummyjson.com",
+        pathname: "/**",
+      },
     ],
+
+    minimumCacheTTL: 60,
+    formats: ["image/webp", "image/avif"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
   },
 
   async rewrites() {

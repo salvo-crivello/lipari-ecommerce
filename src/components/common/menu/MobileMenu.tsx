@@ -7,7 +7,10 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
-import { IconButton } from "../../Button";
+import { IconButton } from "../../ui/Button";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/src/store/store";
+import { toggleCart } from "@/src/store/sliceCart";
 
 interface MenuProps {
   toggleMenu: () => void;
@@ -73,9 +76,16 @@ export const MenuSlide = ({ toggleMenu, isOpen }: MenuProps) => {
 
 const MenuList = ({ toggleMenu }: MenuProps) => {
   const pathname = usePathname();
+  const { isOpen: cartIsOpen } = useSelector(
+    (state: RootState) => state.cartData
+  );
+  const dispatch = useDispatch();
 
   const handleClick = () => {
     toggleMenu();
+    if (cartIsOpen) {
+      dispatch(toggleCart());
+    }
   };
 
   return (
@@ -89,7 +99,7 @@ const MenuList = ({ toggleMenu }: MenuProps) => {
           <Link
             href={page.path}
             aria-label={`Navigate to ${page.name}`}
-            className={clsx("font-mono uppercase text-2xl", {
+            className={clsx("text-2xl", {
               " text-white group-hover:text-lime-500": pathname !== page.path,
               " text-lime-500 pointer-events-none": pathname === page.path,
             })}

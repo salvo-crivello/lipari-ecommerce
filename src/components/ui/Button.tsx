@@ -7,16 +7,21 @@ import Link, { LinkProps } from "next/link";
 import { AnchorHTMLAttributes, ButtonHTMLAttributes, ElementType } from "react";
 
 export const buttonVariants = cva(
-  "group inline-flex gap-2.5 items-center justify-center font-medium transition-all duration-150 ease-in h-fit w-fit text-nowrap disabled:pointer-events-none leading-none text-md disabled:opacity-30",
+  "group inline-flex gap-2.5 items-center font-medium transition-all duration-150 ease-in h-fit w-fit text-nowrap disabled:pointer-events-none leading-none text-md disabled:opacity-30",
   {
     variants: {
       variant: {
-        fill: "bg-blue-950 text-white hover:bg-blue-600 active:bg-blue-700 hover:-translate-y-1 active:-translate-y-0",
+        fill: "bg-blue-950 justify-center text-white hover:bg-blue-600 active:bg-blue-700 hover:-translate-y-1 active:-translate-y-0",
         secondary:
-          "bg-black/10 hover:-translate-y-1 active:-translate-y-0 hover:bg-black/15 text-white",
-        tertiary: "bg-black/5 hover:bg-black/10 active:black/5",
-        ghost: "bg-transparent hover:-translate-y-1 active:-translate-y-0",
-        text: "bg-transparent hover:underline hover:text-blue-600",
+          "bg-black/10 justify-center hover:-translate-y-1 active:-translate-y-0 hover:bg-black/15 text-white",
+        with_border:
+          "bg-transparent justify-center hover:-translate-y-1 active:-translate-y-0 border border-blue-950 text-blue-950 hover:border-blue-600 hover:text-blue-600",
+        tertiary: "justify-center bg-black/5 hover:bg-black/10 active:black/5",
+        ghost:
+          "justify-center bg-transparent hover:-translate-y-1 active:-translate-y-0",
+        text: "justify-center bg-transparent hover:underline hover:text-blue-600",
+        inputButton:
+          "bg-transparent border border-neutral-300 text-neutral-700 hover:border-blue-600 hover:text-blue-600 justify-start",
       },
       size: {
         default: "px-4 py-2",
@@ -62,7 +67,7 @@ interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   icon?: ElementType;
-  iconPos?: "left" | "right" | undefined;
+  iconPos?: "left" | "right" | "center" | undefined;
 }
 
 export const Button = ({
@@ -82,12 +87,15 @@ export const Button = ({
         {
           "pl-4": Icon && iconPos === "left",
           "pr-4": Icon && iconPos === "right",
+          "": Icon && iconPos === "center",
         },
         className
       )}
       {...props}
     >
-      {Icon && iconPos === "left" && <Icon size="1.2em" className="shrink-0" />}
+      {Icon && (iconPos === "left" || iconPos === "center") && (
+        <Icon size="1.2em" className="shrink-0" />
+      )}
       {children}
       {Icon && iconPos === "right" && (
         <Icon size="1.2em" className="shrink-0" />
@@ -103,7 +111,7 @@ export interface LinkButtonProps
     Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps>,
     VariantProps<typeof buttonVariants> {
   icon?: ElementType;
-  iconPos?: "left" | "right" | undefined;
+  iconPos?: "left" | "right" | "center" | undefined;
 }
 
 export const LinkButton = ({
@@ -123,12 +131,15 @@ export const LinkButton = ({
         {
           "pl-4": Icon && iconPos === "left",
           "pr-4": Icon && iconPos === "right",
+          "": Icon && iconPos === "center",
         },
         className
       )}
       {...props}
     >
-      {Icon && iconPos === "left" && <Icon size="1.2em" className="shrink-0" />}
+      {Icon && (iconPos === "left" || iconPos === "center") && (
+        <Icon size="1.2em" className="shrink-0" />
+      )}
       {children}
       {Icon && iconPos === "right" && (
         <Icon size="1.2em" className="shrink-0" />
@@ -142,7 +153,7 @@ export const LinkButton = ({
 interface IconButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  icon: ElementType;
+  icon: ElementType | null;
 }
 
 export const IconButton = ({
@@ -151,6 +162,7 @@ export const IconButton = ({
   rounded,
   icon: Icon,
   className,
+  children,
   ...props
 }: IconButtonProps) => {
   return (
@@ -162,7 +174,8 @@ export const IconButton = ({
       )}
       {...props}
     >
-      <Icon size="1.2em" className="shrink-0" />
+      {children}
+      {Icon && <Icon size="1.2em" className="shrink-0" />}
     </button>
   );
 };

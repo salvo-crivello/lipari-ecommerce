@@ -1,7 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { BASE_PRODUCTS_API, productType } from "./sliceProducts";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
-import { g } from "motion/react-client";
 
 const ProductsApiSlice = createApi({
   reducerPath: "productsApi",
@@ -10,7 +9,7 @@ const ProductsApiSlice = createApi({
   }),
   endpoints: (builder) => ({
     fetchProducts: builder.query<productType[], number>({
-      query: (page: number) => `?page=${page}&limit=12`,
+      query: (page: number) => `?page=${page}&limit=4`,
       transformResponse: (response: { products: productType[] }) =>
         response.products,
     }),

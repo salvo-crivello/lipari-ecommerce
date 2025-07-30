@@ -3,7 +3,7 @@ import React from "react";
 
 function SectionHero() {
   return (
-    <header className="h-screen min-h-fit px-5 lg:px-10 pt-40 pb-20 bg-[url('/hero.webp')] bg-auto bg-top flex gap-2 flex-col xl:flex-row">
+    <header className="h-screen min-h-fit px-5 lg:px-10 pt-40 pb-20 bg-[url('/hero.webp')] bg-cover bg-top flex gap-2 flex-col xl:flex-row">
       {/* <h1 className="text-7xl font-bold font-mono">Ballarò 3.0</h1> */}
       <div className="w-full flex gap-2 flex-col">
         <div className="bg-white h-[300px] xl:h-full w-full rounded-xl"></div>
