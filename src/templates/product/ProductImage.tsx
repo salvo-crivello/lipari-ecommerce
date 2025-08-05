@@ -1,28 +1,20 @@
-import { productType } from "@/src/store/sliceProducts";
-import Image from "next/image";
-import { memo } from "react";
+import { DiscountBadge, PopularBadge } from '@/src/components/BadgesAndLabels';
+import ProductImg from '@/src/components/ProductImg';
+import { productType } from '@/src/store/sliceProducts';
+import { memo } from 'react';
 
 const ProductImage = ({ product }: { product: productType }) => {
-  const { image, title, popular } = product;
+	const { image, title, popular, discount } = product;
 
-  return (
-    <div className="flex w-full lg:min-w-[240px] h-full max-sm:aspect-square relative rounded-xl overflow-hidden shadow-xl shadow-neutral-100">
-      {popular && (
-        <span className="absolute top-5 left-0 bg-lime-500 rounded-tr-xl p-2 pr-4 text-white uppercase text-sm font-semibold">
-          Popolare
-        </span>
-      )}
-      <Image
-        src={image || "/placeholder.png"}
-        alt={title || "product image"}
-        width={400}
-        height={400}
-        className="object-cover md:mx-auto max-md:w-full max-md:h-full"
-        placeholder="blur"
-        blurDataURL="/placeholder.png"
-      />
-    </div>
-  );
+	return (
+		<div className="flex max-sm:aspect-square relative rounded-xl overflow-hidden shadow-xl shadow-neutral-100 min-w-[300px] min-h-[300px] items-center justify-center">
+			<div className="flex flex-wrap absolute top-4 left-4 gap-2">
+				<PopularBadge popular={popular} />
+				<DiscountBadge discount={discount} />
+			</div>
+			<ProductImg image={image} title={title} />
+		</div>
+	);
 };
 
 export default memo(ProductImage);
